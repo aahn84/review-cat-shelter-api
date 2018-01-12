@@ -2,8 +2,8 @@ const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 3000
 
-let model = require('./model')
-console.log(model)
+// let model = require('./model')
+// console.log(model)
 // the same as:
 // let model = require('./model/index')
 // this is a very specific node js behavior - will look specifically for 'index.js'
@@ -14,54 +14,31 @@ const bodyParser = require('body-parser')
 app.use(morgan('dev'))
 app.use(bodyParser.json())
 
-// READ routes
-app.get('/cats', (req, res) => {
-  // res.json(model.cats)
-  let cats = model.getAllCats()
-  res.json({data: cats})
-})
+app.route('/cats')
+  .get(controller.getAllCats)
+  .post(controller.CreateCat)
 
-app.get('/cats/:id', (req, res) => {
-  let id = Number(req.params.id)
-  let cat = model.getCat(id)
+app.route('/cats/:id')
+  .get(controller.getCat)
+  .patch(controller.updateCat)
+  .delete(controller.deleteCat)
 
-  res.json({data: cat})
+  app.use(morgan('dev'))
+  app.use(bodyParser.json())
 
-  // let cat = model.cats.filter(cat => cat.id === req.params.id)[0]
+/*
+ABOVE is the most optimized and modular, below also works:
+-----
 
-  /*
+app.route('/cats')
+  .get(controller.getAllCats)
+  .post(controller.CreateCat)
 
-  can also be written as:
-
-  let catsWhoMatchTheId = model.cats.filter(cat => {
-  return cat.id === req.params.id
-  })
-
-  // let catsWhoMatchTheId = model.cats.filter(cat => cat.id === req.params.id)[0]
-  // let specificCat = catsWhoMatchTheId[0]
-
-  */
-  // res.json({data: cat})
-})
-
-// CREATE route
-app.post('/cats', (req, res) => {
-  let newCat = model.createCat(req.body)
-  res.json({data: newCat})
-})
-
-// UPDATE route
-app.patch('/cats/:id', (req, res) => {
-  let updatedCat = model.updateCat(req.params.id, req.body)
-  res.json({data: updatedCat})
-})
-
-// DELETE route
-app.delete('/cats.:id', (req, res) => {
-  let deletedCat = model.deleteCat(req.params.id)
-  res.json({data: deletedCat})
-})
-
+app.route('/cats/:id')
+  .get(controller.getCat)
+  .patch(controller.updateCat)
+  .delete(controller.deleteCat)
+*/
 
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`)
